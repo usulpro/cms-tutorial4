@@ -1,6 +1,7 @@
 import {
   BlockPreview,
   customRichText,
+  imageWithMetadata,
 } from '@focus-reactive/cms-kit-sanity/sanity';
 import { defineBlockType, defineComponentType } from '../../sa-config';
 
@@ -15,9 +16,19 @@ export const simpleCard = defineComponentType(({ df }) => ({
       title: 'Company',
     }),
     df({
+      name: 'badgeColor',
+      type: 'string',
+      title: 'Badge Color',
+    }),
+    df({
       name: 'title',
       type: 'string',
       title: 'Title',
+    }),
+    df({
+      name: 'logo',
+      type: imageWithMetadata.name,
+      title: 'Company Logo',
     }),
     df({
       name: 'description',
@@ -44,7 +55,7 @@ export const newBlock = defineBlockType(({ df }) => ({
     }),
     df({
       name: 'description',
-      type: 'text',
+      type: customRichText.name,
       title: 'Description',
     }),
     df({

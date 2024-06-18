@@ -1,46 +1,14 @@
 import React from 'react';
 
-import { withCMS } from '@focus-reactive/cms-kit-sanity';
+import { getCmsKey, withCMS } from '@focus-reactive/cms-kit-sanity';
 import { ContentBlockGeneric } from '@focus-reactive/cms-kit-sanity/sanity';
 import { GenericRichText } from '@focus-reactive/cms-kit-sanity/common';
 
-import { sa } from './sa-adapters';
+import { sa, saSimpleCard } from './sa-adapters';
 import { SmartImage } from '../../ContentComponents/SmartImage';
 import { Section, SectionProps } from '../../ContentComponents/Section';
 
-const defaultCards: SimpleCardProps[] = [
-  {
-    company: 'Alphabet Inc.',
-    title: 'Official website',
-    description:
-      'Flowbite helps you connect with friends, family and communities of people who share your interests.',
-    link: '#',
-  },
-  {
-    company: 'Microsoft Corp.',
-    title: 'Management system',
-    description:
-      'Flowbite helps you connect with friends, family and communities of people who share your interests.',
-    link: '#',
-  },
-  {
-    company: 'Adobe Inc.',
-    title: 'Logo design',
-    description:
-      'Flowbite helps you connect with friends, family and communities of people who share your interests.',
-    link: '#',
-  },
-];
-
-const defaultProps: PortfolioBlockProps = {
-  _type: 'tw.newBlock',
-  title: 'Our work',
-  description:
-    'Crafted with skill and care to help our clients grow their business!',
-  cards: defaultCards,
-};
-
-const RichTextComponents = {
+const richTextComponents = {
   block: {
     h2: ({ children }: { children: React.ReactElement }) => (
       <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -48,7 +16,25 @@ const RichTextComponents = {
       </h2>
     ),
     normal: ({ children }: { children: React.ReactElement }) => (
-      <p className="mt-2 text-lg leading-8 text-gray-600">{children}</p>
+      <p className="mt-4 text-base font-normal text-gray-500 sm:text-xl dark:text-gray-400">
+        {children}
+      </p>
+    ),
+  },
+  marks: {
+    link: ({
+      value,
+      children,
+    }: {
+      children: React.ReactElement;
+      value: { href: string };
+    }) => (
+      <a
+        href={value?.href}
+        className="text-blue-500 sm:text-xl dark:text-blue-400"
+      >
+        {children}
+      </a>
     ),
   },
 };
@@ -74,28 +60,36 @@ const ArrowIcon: React.FC = () => {
 type SimpleCardProps = {
   company: string;
   title: string;
+  logo: object;
   description: string;
   link: string;
+  badgeColor: string;
 };
 
 const SimpleCard: React.FC<SimpleCardProps> = ({
   company,
   title,
+  logo,
   description,
   link,
+  badgeColor,
 }) => {
   return (
     <div className="space-y-4">
-      <span className="bg-gray-100 text-gray-900 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+      <span
+        className={`text-white text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded`}
+      >
         {company}
       </span>
       <h3 className="text-2xl font-bold leading-tight text-gray-900 dark:text-white">
         {title}
       </h3>
+      <SmartImage imageWithMetadata={logo} className="m-auto w-16" />
       <p className="text-lg font-normal text-gray-500 dark:text-gray-400">
         {description}
       </p>
       <a
+        style={badgeColor ? { backgroundColor: badgeColor } : undefined}
         href={link}
         title=""
         className="text-white bg-primary-700 justify-center hover:bg-primary-800 inline-flex items-center focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
@@ -108,14 +102,19 @@ const SimpleCard: React.FC<SimpleCardProps> = ({
   );
 };
 
+const SimpleCardCMS = withCMS({ sa: saSimpleCard })(SimpleCard);
+
 type PortfolioBlockProps = ContentBlockGeneric & {
   title: string;
   description: string;
   cards: SimpleCardProps[];
 };
 
-const NewBlock: React.FC<PortfolioBlockProps> = () => {
-  const { title, description, cards } = defaultProps;
+const NewBlock: React.FC<PortfolioBlockProps> = ({
+  title,
+  description,
+  cards,
+}) => {
   return (
     <section className="bg-white dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 py-8 mx-auto lg:px-6 sm:py-16 lg:py-24">
@@ -123,13 +122,14 @@ const NewBlock: React.FC<PortfolioBlockProps> = () => {
           <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-4xl dark:text-white">
             {title}
           </h2>
-          <p className="mt-4 text-base font-normal text-gray-500 sm:text-xl dark:text-gray-400">
-            {description}
-          </p>
+          <GenericRichText
+            value={description}
+            components={richTextComponents}
+          />
         </div>
         <div className="grid grid-cols-1 mt-12 text-center sm:mt-16 gap-x-20 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((card, index) => (
-            <SimpleCard key={index} {...card} />
+          {cards.map((card) => (
+            <SimpleCardCMS key={getCmsKey(card)} {...card} />
           ))}
         </div>
       </div>

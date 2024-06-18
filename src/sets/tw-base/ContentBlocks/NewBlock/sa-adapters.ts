@@ -4,17 +4,26 @@ import { vercelStegaSplit } from '@vercel/stega';
 type SaProps = {
   _type: string;
   _id: string;
+  cards: Array<object>;
 };
 
 // @ts-ignore
 export const sa: AdapterFn = (cmsProps: SaProps) => {
-  // const backgroundColor = vercelStegaSplit(
-  //   // @ts-ignore
-  //   cmsProps?.backgroundColor || 'white',
-  // ).cleaned;
+  return {
+    key: getCmsKey(cmsProps),
+    // @ts-ignore
+    description: 'hellow world',
+    ...cmsProps,
+    cards: cmsProps.cards || [],
+  };
+};
+
+// @ts-ignore
+export const saSimpleCard: AdapterFn = (cmsProps: { badgeColor: string }) => {
   return {
     key: getCmsKey(cmsProps),
     ...cmsProps,
-    // cmsProps.backgroundColor,
+    badgeColor:
+      cmsProps.badgeColor && vercelStegaSplit(cmsProps.badgeColor).cleaned,
   };
 };

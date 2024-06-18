@@ -19,6 +19,21 @@ export const landingPageQuery = groq`
         }
       }
     },
+    _type == 'tw-base.newBlock' => {
+      ...,
+      cards[]{
+        ...,
+        logo{
+          ...,
+          'imageAsset': asset->{
+              'src': url,
+              'width': metadata.dimensions.width,
+              'height': metadata.dimensions.height,
+              'alt': altText,
+            }
+        }
+      }
+    },
   _type == 'tw-base.pageBlock' => { // TODO: move it to pageBlock folder
     ...,
     blockOptions{
